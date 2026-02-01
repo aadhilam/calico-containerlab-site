@@ -15,7 +15,11 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     <div className="prose">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw, rehypeSlug, rehypeHighlight]}
+        rehypePlugins={[
+          rehypeRaw,
+          rehypeSlug,
+          [rehypeHighlight, { detect: true, ignoreMissing: true }],
+        ]}
       >
         {content}
       </ReactMarkdown>

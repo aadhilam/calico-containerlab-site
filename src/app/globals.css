@@ -4,8 +4,9 @@
   /* Tailwind semantic tokens (default: dark) */
   --color-background: #0d1117;
   --color-foreground: #e6edf3;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Provide fallbacks so missing `next/font` vars don't break mono alignment */
+  --font-sans: var(--font-geist-sans, system-ui);
+  --font-mono: var(--font-geist-mono, ui-monospace);
 }
 
 :root {
@@ -17,11 +18,13 @@
   --bg-card-hover: #252c35;
   --text-primary: #e6edf3;
   --text-secondary: #8b949e;
+  --text-body: var(--text-secondary);
   --accent: #f97316;
   --accent-dim: #c2410c;
   --border: #30363d;
   --code-bg: #1a1e24;
   --code-inline: #f0883e;
+  --code-tab-size: 8;
 
   /* Code highlighting (default: dark) */
   --hljs-text: #e6edf3;
@@ -52,7 +55,9 @@
   --bg-card: #ffffff;
   --bg-card-hover: #f1f3f5;
   --text-primary: #1f2328;
-  --text-secondary: #57606a;
+  /* Slightly darker than GitHub-muted for readability */
+  --text-secondary: #424a53;
+  --text-body: var(--text-primary);
   --accent: #c2410c;
   --accent-dim: #9a3412;
   --border: #d0d7de;
@@ -61,7 +66,7 @@
 
   /* Code highlighting (light) */
   --hljs-text: #1f2328;
-  --hljs-comment: #6e7781;
+  --hljs-comment: #57606a;
   --hljs-keyword: #cf222e;
   --hljs-string: #0a3069;
   --hljs-number: #8250df;
@@ -81,6 +86,12 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
+/* Avoid extra-thin text rendering in light mode (especially on macOS) */
+:root[data-theme='light'] body {
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+}
+
 /* Markdown content styles */
 .prose h1, .prose h2, .prose h3, .prose h4 {
   color: var(--text-primary);
@@ -94,11 +105,11 @@ body {
 .prose h3 { font-size: 1.25em; }
 .prose h4 { font-size: 1.1em; }
 
-.prose p { margin: 0.8em 0; line-height: 1.7; color: var(--text-secondary); }
+.prose p { margin: 0.8em 0; line-height: 1.7; color: var(--text-body); }
 .prose a { color: var(--accent); text-decoration: none; }
 .prose a:hover { text-decoration: underline; }
 
-.prose ul, .prose ol { margin: 0.5em 0; padding-left: 1.5em; color: var(--text-secondary); }
+.prose ul, .prose ol { margin: 0.5em 0; padding-left: 1.5em; color: var(--text-body); }
 .prose li { margin: 0.25em 0; line-height: 1.6; }
 
 .prose code {
@@ -117,18 +128,32 @@ body {
   padding: 1em;
   overflow-x: auto;
   margin: 1em 0;
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 0.85em;
-  line-height: 1.6;
+  color: var(--hljs-text);
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9em;
+  line-height: 1.7;
   white-space: pre;
 }
 .prose pre code {
+  display: block;
   background: none;
   padding: 0;
   color: inherit;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+  font-weight: 450;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
+  tab-size: var(--code-tab-size);
+  font-variant-ligatures: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Slightly stronger mono weight in light mode */
+:root[data-theme='light'] .prose pre code {
+  font-weight: 500;
 }
 
 .prose img {
