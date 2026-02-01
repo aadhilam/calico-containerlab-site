@@ -9,7 +9,7 @@ import {
 import MarkdownRenderer from '@/components/MarkdownRenderer'
 import TableOfContents from '@/components/TableOfContents'
 import ProgressTracker from '@/components/ProgressTracker'
-import LessonCard from '@/components/LessonCard'
+import LessonScroller from '@/components/LessonScroller'
 
 interface LessonPageProps {
   readonly params: Promise<{ slug: string }>
@@ -48,6 +48,11 @@ export default async function LessonPage({ params }: LessonPageProps) {
     ),
   ].slice(0, 4)
 
+  const explore = [
+    ...related,
+    ...otherLessons.filter((l) => !related.some((r) => r.slug === l.slug)),
+  ]
+
   return (
     <>
       <ProgressTracker slug={slug} />
@@ -76,15 +81,30 @@ export default async function LessonPage({ params }: LessonPageProps) {
           </aside>
         </div>
 
-        <section className="mt-16 border-t border-[var(--border)] pt-10">
-          <h2 className="mb-6 text-xl font-semibold">Explore more lessons</h2>
-          <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-4">
-            {related.map((l) => (
-              <LessonCard key={l.slug} lesson={l} />
-            ))}
-          </div>
-        </section>
       </div>
+
+      <section className="mt-16 border-t border-[var(--border)] bg-[var(--bg-secondary)]">
+        <div className="mx-auto max-w-7xl px-6 pt-10">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-3 text-left">
+            <div>
+              <h2 className="text-xl font-semibold">Explore more lessons</h2>
+              <p className="mt-1 text-sm text-[var(--text-secondary)]">
+                Scroll to see more
+              </p>
+            </div>
+            <Link
+              href="/"
+              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              View all lessons →
+            </Link>
+          </div>
+        </div>
+
+        <div className="px-6 pb-10">
+          <LessonScroller lessons={explore} />
+        </div>
+      </section>
     </>
   )
 }

@@ -109,8 +109,27 @@ body {
 .prose a { color: var(--accent); text-decoration: none; }
 .prose a:hover { text-decoration: underline; }
 
-.prose ul, .prose ol { margin: 0.5em 0; padding-left: 1.5em; color: var(--text-body); }
-.prose li { margin: 0.25em 0; line-height: 1.6; }
+.prose ul, .prose ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+  color: var(--text-body);
+  list-style-position: outside;
+}
+.prose ul { list-style-type: disc; }
+.prose ol { list-style-type: decimal; }
+.prose ul ul { list-style-type: circle; }
+.prose ul ul ul { list-style-type: square; }
+.prose li {
+  display: list-item;
+  margin: 0.25em 0;
+  line-height: 1.6;
+}
+.prose li::marker { color: var(--text-secondary); }
+
+/* GitHub-flavored task lists */
+.prose ul.contains-task-list { padding-left: 0; list-style: none; }
+.prose li.task-list-item { list-style: none; }
+.prose li.task-list-item > input[type="checkbox"] { margin-right: 0.5em; }
 
 .prose code {
   background: var(--code-bg);
