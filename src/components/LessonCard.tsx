@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { Lesson } from '@/lib/lessons'
 
 interface LessonCardProps {
@@ -9,12 +9,11 @@ interface LessonCardProps {
 }
 
 export default function LessonCard({ lesson }: LessonCardProps) {
-  const [completed, setCompleted] = useState(false)
-
-  useEffect(() => {
+  const [completed] = useState(() => {
+    if (typeof window === 'undefined') return false
     const progress = JSON.parse(localStorage.getItem('lesson-progress') ?? '{}')
-    setCompleted(progress[lesson.slug] === true)
-  }, [lesson.slug])
+    return progress[lesson.slug] === true
+  })
 
   return (
     <Link

@@ -1,8 +1,9 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
+import Script from "next/script"
 import "./globals.css"
-import ThemeProvider from "../components/ThemeProvider"
-import ThemeToggle from "../components/ThemeToggle"
+import ThemeToggle from "@/components/ThemeToggle"
+import Link from "next/link"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,21 +27,34 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <head>
+        <Script id="theme-init" strategy="beforeInteractive">{`
+(() => {
+  try {
+    const stored = localStorage.getItem('theme');
+    const systemPrefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+    const theme = stored === 'light' || stored === 'dark'
+      ? stored
+      : (systemPrefersLight ? 'light' : 'dark');
+    document.documentElement.dataset.theme = theme;
+  } catch {}
+})();
+        `}</Script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider>
         <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg-secondary)]/80 backdrop-blur-md">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-            <a href="/" className="flex items-center gap-2 text-lg font-bold text-[var(--accent)]">
+            <Link href="/" className="flex items-center gap-2 text-lg font-bold text-[var(--accent)]">
               <img src="https://avatars.githubusercontent.com/u/12304728?s=200&v=4" alt="Calico" width={28} height={28} className="rounded" />
               Calico Labs
-            </a>
-            <nav className="flex items-center gap-4 text-sm text-[var(--text-secondary)]">
-              <a href="/" className="hover:text-[var(--text-primary)] transition-colors">
+            </Link>
+            <nav className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
+              <Link href="/" className="hover:text-[var(--text-primary)] transition-colors">
                 Lessons
-              </a>
+              </Link>
               <a
                 href="https://github.com/aadhilam/k8-networking-calico-containerlab"
                 target="_blank"
@@ -54,7 +68,6 @@ export default function RootLayout({
           </div>
         </header>
         <main>{children}</main>
-        </ThemeProvider>
       </body>
     </html>
   )

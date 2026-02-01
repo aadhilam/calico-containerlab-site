@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import {
   getLessons,
   getLesson,
@@ -52,9 +53,9 @@ export default async function LessonPage({ params }: LessonPageProps) {
       <ProgressTracker slug={slug} />
       <div className="mx-auto max-w-7xl px-6 py-8">
         <nav className="mb-6 text-sm text-[var(--text-secondary)]">
-          <a href="/" className="hover:text-[var(--accent)] transition-colors">
+          <Link href="/" className="hover:text-[var(--accent)] transition-colors">
             Lessons
-          </a>
+          </Link>
           <span className="mx-2">/</span>
           <span className="text-[var(--text-primary)]">{lesson.title}</span>
         </nav>
