@@ -13,8 +13,8 @@
   --text-secondary: #57606a;
   --accent: #f97316;
   --accent-dim: #c2410c;
-  --border: #e6e9ed;
-  --code-bg: #f6f8fa;
+  --border: #cbd5e1; /* stronger border for headings/tables */
+  --code-bg: #f3f4f6; /* slightly darker to improve contrast for light mode */
 }
 
 /* Dark overrides */
@@ -27,8 +27,8 @@
   --text-secondary: #8b949e;
   --accent: #f97316;
   --accent-dim: #c2410c;
-  --border: #30363d;
-  --code-bg: #1a1e24;
+  --border: #484f59; /* slightly lighter to be visible on dark */
+  --code-bg: #0f1721; /* deeper dark background for better contrast */
 }
 
 body {
@@ -38,14 +38,17 @@ body {
 }
 
 /* Shared prose styles (light + dark variants below) */
-.prose-common h1, .prose-common h2, .prose-common h3, .prose-common h4 {
-  font-weight: 600;
+..prose-common h1, .prose-common h2, .prose-common h3, .prose-common h4 {
+  font-weight: 700;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
   scroll-margin-top: 80px;
 }
-.prose-common h1 { font-size: 2em; padding-bottom: 0.3em; }
-.prose-common h2 { font-size: 1.5em; padding-bottom: 0.3em; }
+.prose-common h1 { font-size: 2.125em; padding-bottom: 0.35em; }
+.prose-common h2 { font-size: 1.5em; padding-bottom: 0.35em; }
+
+/* make h1/h2 borders more visible */
+.prose-common h1, .prose-common h2 { border-bottom: 1px solid var(--border); }
 .prose-common h3 { font-size: 1.25em; }
 .prose-common h4 { font-size: 1.1em; }
 
@@ -83,13 +86,16 @@ body {
 .prose-dark pre code { background: none; padding: 0; color: inherit; font-family: inherit; font-size: inherit; line-height: inherit; }
 
 /* Better syntax highlighting (small, theme-aware rules using HLJS classes) */
-pre code.hljs, pre.hljs { display: block; overflow-x: auto; padding: 1em; border-radius: 8px; }
+pre code.hljs, pre.hljs { display: block; overflow-x: auto; padding: 1.25em; border-radius: 8px; box-shadow: 0 1px 0 rgba(16,24,40,0.04); font-size: 0.95em; line-height: 1.7; }
 .hljs { background: var(--code-bg); color: var(--text-primary); }
-.hljs-comment, .hljs-quote { color: #6b7280; font-style: italic; }
-.hljs-keyword, .hljs-selector-tag, .hljs-subst { color: #2563eb; font-weight: 600; }
-.hljs-string, .hljs-title, .hljs-name, .hljs-type, .hljs-attribute, .hljs-symbol { color: #16a34a; }
-.hljs-number, .hljs-literal { color: #b45309; }
-.hljs-built_in, .hljs-builtin-name { color: #7c3aed; }
+/* higher contrast token colors */
+.hljs-comment, .hljs-quote { color: #4b5563; font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-subst { color: #0b5cff; font-weight: 700; }
+.hljs-string, .hljs-title, .hljs-name, .hljs-type, .hljs-attribute, .hljs-symbol { color: #0f9d58; }
+.hljs-number, .hljs-literal { color: #9a3412; font-weight: 600; }
+.hljs-built_in, .hljs-builtin-name { color: #7c3aed; font-weight: 600; }
+/* subtle padding for inline code */
+code { padding: 0.12em 0.35em; border-radius: 4px; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 8px; }

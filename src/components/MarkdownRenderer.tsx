@@ -21,7 +21,8 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   const themeClass = mounted ? (resolvedTheme === 'dark' ? 'prose-dark' : 'prose-light') : 'prose-light'
 
   return (
-    <div className={themeClass}>
+    <div className={`prose-common ${themeClass}`}>
+
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSlug, rehypeHighlight]}
