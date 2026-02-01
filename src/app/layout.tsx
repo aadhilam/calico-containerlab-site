@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
+import ThemeProvider from "../components/ThemeProvider"
+import ThemeToggle from "../components/ThemeToggle"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,10 +26,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ThemeProvider>
         <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg-secondary)]/80 backdrop-blur-md">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
             <a href="/" className="flex items-center gap-2 text-lg font-bold text-[var(--accent)]">
@@ -46,10 +49,12 @@ export default function RootLayout({
               >
                 GitHub
               </a>
+              <ThemeToggle />
             </nav>
           </div>
         </header>
         <main>{children}</main>
+        </ThemeProvider>
       </body>
     </html>
   )
