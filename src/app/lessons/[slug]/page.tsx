@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { JetBrains_Mono, Noto_Sans_Math } from 'next/font/google'
 import {
   getLessons,
   getLesson,
@@ -10,6 +11,19 @@ import MarkdownRenderer from '@/components/MarkdownRenderer'
 import TableOfContents from '@/components/TableOfContents'
 import ProgressTracker from '@/components/ProgressTracker'
 import LessonScroller from '@/components/LessonScroller'
+
+const ipamSans = Noto_Sans_Math({
+  variable: '--font-geist-sans',
+  weight: '400',
+  subsets: ['latin', 'math'],
+  display: 'swap',
+})
+
+const ipamMono = JetBrains_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+  display: 'swap',
+})
 
 interface LessonPageProps {
   readonly params: Promise<{ slug: string }>
@@ -34,6 +48,9 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const lesson = getLesson(slug)
   if (!lesson) notFound()
 
+  const fontVars =
+    slug === '01-calico-ipam' ? `${ipamSans.variable} ${ipamMono.variable}` : undefined
+
   const content = await fetchLessonContent(slug)
   const headings = extractHeadings(content)
 
@@ -54,7 +71,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   ]
 
   return (
-    <>
+    <div className={fontVars}>
       <ProgressTracker slug={slug} />
       <div className="mx-auto max-w-7xl px-6 py-8">
         <nav className="mb-6 text-sm text-[var(--text-secondary)]">
@@ -105,6 +122,6 @@ export default async function LessonPage({ params }: LessonPageProps) {
           <LessonScroller lessons={explore} />
         </div>
       </section>
-    </>
+    </div>
   )
 }

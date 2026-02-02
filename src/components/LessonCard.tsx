@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import type { Lesson } from '@/lib/lessons'
@@ -9,19 +10,35 @@ interface LessonCardProps {
 }
 
 export default function LessonCard({ lesson }: LessonCardProps) {
+  const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null)
   const [completed] = useState(() => {
     if (typeof window === 'undefined') return false
     const progress = JSON.parse(localStorage.getItem('lesson-progress') ?? '{}')
     return progress[lesson.slug] === true
   })
 
+  const showTileImage = Boolean(lesson.image) && failedImageSrc !== lesson.image
+
   return (
     <Link
       href={`/lessons/${lesson.slug}`}
       className="group relative flex flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-card)] transition-all hover:border-[var(--accent)]/50 hover:bg-[var(--bg-card-hover)] hover:shadow-lg hover:shadow-orange-500/5"
     >
-      <div className="flex h-40 items-center justify-center bg-[var(--bg-secondary)] p-6">
-        <LessonIcon order={lesson.order} />
+      <div className="relative flex h-40 items-center justify-center bg-[var(--bg-secondary)]">
+        {showTileImage ? (
+          <Image
+            src={lesson.image}
+            alt={lesson.title}
+            fill
+            sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover"
+            onError={() => setFailedImageSrc(lesson.image)}
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center p-6">
+            <LessonIcon order={lesson.order} />
+          </div>
+        )}
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
         <span className="text-xs font-mono text-[var(--accent)]">
