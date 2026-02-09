@@ -82,6 +82,12 @@ function stripCalloutFromReactChildren(
   return null
 }
 
+function isParagraphElement(
+  node: unknown
+): node is React.ReactElement<{ children?: React.ReactNode }> {
+  return React.isValidElement(node) && node.type === 'p'
+}
+
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <div className="prose">
@@ -108,7 +114,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             const remainingBlocks = childArray.slice(1)
             let bodyBlocks: React.ReactNode[] = remainingBlocks
 
-            if (React.isValidElement(firstBlock) && firstBlock.type === 'p') {
+            if (isParagraphElement(firstBlock)) {
               const stripped = stripCalloutFromReactChildren(firstBlock.props.children)
               if (stripped) {
                 bodyBlocks = [<p key="callout-first">{stripped.stripped}</p>, ...remainingBlocks]
@@ -148,7 +154,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
 
             let stripped: ReturnType<typeof stripCalloutFromReactChildren> = null
             let strippedFromFirstParagraph = false
-            if (React.isValidElement(firstBlock) && firstBlock.type === 'p') {
+            if (isParagraphElement(firstBlock)) {
               stripped = stripCalloutFromReactChildren(firstBlock.props.children)
               strippedFromFirstParagraph = !!stripped
             } else {

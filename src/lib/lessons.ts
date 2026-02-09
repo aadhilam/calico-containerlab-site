@@ -8,29 +8,34 @@ export interface Lesson {
   title: string
   order: number
   image: string
+  youtubeId?: string
 }
 
-const LESSON_META: Record<string, { title: string; image: string }> = {
-  '01-calico-ipam': { title: 'Calico IPAM', image: '/images/calico-ipam7.png' },
-  '02-pod-network': { title: 'Pod Networking', image: '/images/pod-network4.png' },
-  '03-pod-routing': { title: 'Pod Routing Across Nodes', image: '/images/routing6.png' },
-  '04-k8s-services': { title: 'Kubernetes Services - ClusterIP', image: '/images/services4.png' },
-  '05-k8s-dns': { title: 'Kubernetes DNS', image: '/images/dns4.png' },
-  '06-calico-overlay': { title: 'Calico Overlay Networks', image: '/images/overlay.png' },
-  '07-calico-bgp': { title: 'Calico BGP', image: '/images/bgp.png' },
-  '08-calico-bgp-lb': { title: 'LoadBalancer & BGP Advertisements', image: '/images/loadbalancer.png' },
-  '09-multi-ippool': { title: 'Multiple IPPools', image: '/images/ippool.png' },
-  '10-calico-bgp-ippool': { title: 'Advertise IPPool via BGP', image: '/images/bgp-ippool.png' },
-  '11-headless-services': { title: 'Headless Services', image: '/images/headless6.png' },
-  '12-calico-qos': { title: 'Network QoS - Bandwidth Limiting', image: '/images/qos.png' },
-  '13-wireguard': { title: 'WireGuard Encryption', image: '/images/wireguard.png' },
-  '14-calico-ipv6': { title: 'IPv4 & IPv6 Dual-Stack', image: '/images/ipv6.png' },
-  '15-selective-bgp-peering': { title: 'Selective BGP Peering', image: '/images/selective-bgp4.png' },
-  '16-static-ip': { title: 'Static IPs for Pods', image: '/images/static-ip2.png' },
-  '17-nodelocal-dnscache': { title: 'NodeLocal DNSCache', image: '/images/dnscache.svg' },
-  '18-mtu': { title: 'MTU Configuration', image: '/images/mtu2.png' },
-  '19-calico-ingress': { title: 'Calico Ingress', image: '/images/ingress.svg' },
-  '20-ingress-tls': { title: 'Ingress TLS', image: '/images/tls.svg' },
+const LESSON_META: Record<string, { title: string; image: string; youtubeId?: string }> = {
+  '01-calico-ipam': {
+    title: 'Calico IPAM',
+    image: '/images/ipam-simple2.png',
+    youtubeId: 'G-IGFsMSmrA',
+  },
+  '02-pod-network': { title: 'Pod Networking', image: '/images/pod-networking3.png' },
+  '03-pod-routing': { title: 'Pod Routing Across Nodes', image: '/images/routing-bb.png' },
+  '04-k8s-services': { title: 'Kubernetes Services - ClusterIP', image: '/images/services-bb.png' },
+  '05-k8s-dns': { title: 'Kubernetes DNS', image: '/images/dns5.png' },
+  '06-calico-overlay': { title: 'Calico Overlay Networks', image: '/images/overlay-bb.png' },
+  '07-calico-bgp': { title: 'Calico BGP', image: '/images/bgp-bb.png' },
+  '08-calico-bgp-lb': { title: 'LoadBalancer & BGP Advertisements', image: '/images/loadbalancer-bb.png' },
+  '09-multi-ippool': { title: 'Multiple IPPools', image: '/images/ippool-bb.png' },
+  '10-calico-bgp-ippool': { title: 'Advertise IPPool via BGP', image: '/images/bgp-ippool-bb.png' },
+  '11-headless-services': { title: 'Headless Services', image: '/images/headless-bb.png' },
+  '12-calico-qos': { title: 'Network QoS - Bandwidth Limiting', image: '/images/qos-bb.png' },
+  '13-wireguard': { title: 'WireGuard Encryption', image: '/images/wireguard-bb.png' },
+  '14-calico-ipv6': { title: 'IPv4 & IPv6 Dual-Stack', image: '/images/ipv6-bb.png' },
+  '15-selective-bgp-peering': { title: 'Selective BGP Peering', image: '/images/selective-bgp-bb.png' },
+  '16-static-ip': { title: 'Static IPs for Pods', image: '/images/static-ip-bb.png' },
+  '17-nodelocal-dnscache': { title: 'NodeLocal DNSCache', image: '/images/dnscache-bb.png' },
+  '18-mtu': { title: 'MTU Configuration', image: '/images/mtu-bb.png' },
+  '19-calico-ingress': { title: 'Calico Ingress', image: '/images/ingress-bb.png' },
+  '20-ingress-tls': { title: 'Ingress TLS', image: '/images/tls-bb.png' },
 }
 
 export function getLessons(): Lesson[] {
@@ -39,6 +44,7 @@ export function getLessons(): Lesson[] {
     title: meta.title,
     order: parseInt(slug.split('-')[0], 10),
     image: meta.image,
+    youtubeId: meta.youtubeId,
   }))
 }
 
@@ -50,6 +56,7 @@ export function getLesson(slug: string): Lesson | undefined {
     title: meta.title,
     order: parseInt(slug.split('-')[0], 10),
     image: meta.image,
+    youtubeId: meta.youtubeId,
   }
 }
 

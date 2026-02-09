@@ -89,6 +89,21 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 Lesson {String(lesson.order).padStart(2, '0')}
               </span>
               <h1 className="mt-1 text-3xl font-bold">{lesson.title}</h1>
+              {lesson.youtubeId && (
+                <div className="mt-6">
+                  <div className="relative w-full overflow-hidden rounded-xl border border-[var(--border)] bg-black pt-[56.25%]">
+                    <iframe
+                      className="absolute inset-0 h-full w-full"
+                      src={`https://www.youtube-nocookie.com/embed/${lesson.youtubeId}?rel=0`}
+                      title={`${lesson.title} video`}
+                      loading="lazy"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              )}
             </div>
             <MarkdownRenderer content={content} />
           </article>
