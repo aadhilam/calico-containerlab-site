@@ -14,7 +14,7 @@ export interface Lesson {
 const LESSON_META: Record<string, { title: string; image: string; youtubeId?: string }> = {
   '01-calico-ipam': {
     title: 'Calico IPAM',
-    image: '/images/ipam-simple2.png',
+    image: '/images/ipam.png',
     youtubeId: 'G-IGFsMSmrA',
   },
   '02-pod-network': { title: 'Pod Networking', image: '/images/pod-networking3.png' },

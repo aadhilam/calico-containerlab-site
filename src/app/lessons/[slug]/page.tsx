@@ -108,7 +108,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
             <MarkdownRenderer content={content} />
           </article>
 
-          <aside className="hidden w-64 shrink-0 lg:block">
+          <aside className="hidden w-72 shrink-0 lg:block xl:w-80">
             <TableOfContents headings={headings} />
           </aside>
         </div>
