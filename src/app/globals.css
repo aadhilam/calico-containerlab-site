@@ -258,6 +258,36 @@ body {
 .prose li.md-alert-item::marker { content: ''; }
 .prose li.md-alert-item > .md-alert { margin: 0.9em 0; }
 
+.prose .mermaid-loading {
+  margin: 1em 0;
+  color: var(--text-secondary);
+}
+
+.prose .mermaid-diagram {
+  margin: 1em 0;
+  padding: 0.5em;
+  overflow-x: auto;
+}
+
+.prose .mermaid-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.prose .mermaid-diagram .label,
+.prose .mermaid-diagram .nodeLabel,
+.prose .mermaid-diagram .edgeLabel {
+  line-height: 1.2;
+}
+
+.prose .mermaid-diagram .label p,
+.prose .mermaid-diagram .nodeLabel p,
+.prose .mermaid-diagram .edgeLabel p,
+.prose .mermaid-diagram foreignObject p {
+  margin: 0;
+  line-height: 1.2;
+}
+
 /* Code blocks: keep monochrome even if tokens/classes exist */
 .prose pre code span,
 .prose pre code .hljs *,

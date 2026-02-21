@@ -68,16 +68,35 @@ export async function fetchLessonContent(slug: string): Promise<string> {
     const res = await fetch(url, { next: { revalidate: 3600 } })
     if (res.ok) {
       const text = await res.text()
-      return rewriteImageUrls(text, slug)
+      return rewriteUrls(text, slug)
     }
   }
 
   throw new Error(`README not found for lesson: ${slug}`)
 }
 
-function rewriteImageUrls(markdown: string, slug: string): string {
+function rewriteUrls(markdown: string, slug: string): string {
   const base = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${BASE_PATH}/${slug}`
-  return markdown.replace(
+  return markdown
+    .replace(
+      /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
+      (_, alt, path) => `![${alt}](${base}/${path})`
+    )
+    .replace(
+      /\[([^\]]*)\]\(\.\.\/readme\.md(#[^)]*?)?\)/gi,
+      (_, text, hash) => `[${text}](/lab-setup${hash ?? ''})`
+    )
+}
+
+export async function fetchLabSetupContent(): Promise<string> {
+  const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${BASE_PATH}/readme.md`
+  const res = await fetch(url, { next: { revalidate: 3600 } })
+  if (!res.ok) {
+    throw new Error('Lab setup README not found')
+  }
+  const text = await res.text()
+  const base = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${BASE_PATH}`
+  return text.replace(
     /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
     (_, alt, path) => `![${alt}](${base}/${path})`
   )

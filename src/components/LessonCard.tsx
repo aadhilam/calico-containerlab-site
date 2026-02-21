@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import type { Lesson } from '@/lib/lessons'
 
 interface LessonCardProps {
@@ -11,11 +11,11 @@ interface LessonCardProps {
 
 export default function LessonCard({ lesson }: LessonCardProps) {
   const [failedImageSrc, setFailedImageSrc] = useState<string | null>(null)
-  const [completed] = useState(() => {
-    if (typeof window === 'undefined') return false
-    const progress = JSON.parse(localStorage.getItem('lesson-progress') ?? '{}')
-    return progress[lesson.slug] === true
-  })
+  const completed = useSyncExternalStore(
+    subscribeToLessonProgress,
+    () => getLessonCompletion(lesson.slug),
+    () => false,
+  )
 
   const showTileImage = Boolean(lesson.image) && failedImageSrc !== lesson.image
 
@@ -55,6 +55,16 @@ export default function LessonCard({ lesson }: LessonCardProps) {
       )}
     </Link>
   )
+}
+
+function subscribeToLessonProgress(callback: () => void) {
+  window.addEventListener('storage', callback)
+  return () => window.removeEventListener('storage', callback)
+}
+
+function getLessonCompletion(slug: string) {
+  const progress = JSON.parse(localStorage.getItem('lesson-progress') ?? '{}')
+  return progress[slug] === true
 }
 
 function LessonIcon({ order }: { readonly order: number }) {

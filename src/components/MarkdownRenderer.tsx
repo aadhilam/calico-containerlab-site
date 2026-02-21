@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -88,6 +89,87 @@ function isParagraphElement(
   return React.isValidElement(node) && node.type === 'p'
 }
 
+function MermaidDiagram({ chart }: { chart: string }) {
+  const [svg, setSvg] = useState<string>('')
+  const [error, setError] = useState<string | null>(null)
+  const [themeKey, setThemeKey] = useState<string>('dark')
+  const renderId = useMemo(
+    () => `mermaid-${Math.random().toString(36).slice(2, 10)}`,
+    []
+  )
+
+  useEffect(() => {
+    const root = document.documentElement
+    const nextTheme = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
+    setThemeKey(nextTheme)
+
+    const observer = new MutationObserver(() => {
+      const updatedTheme =
+        root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
+      setThemeKey(updatedTheme)
+    })
+
+    observer.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    let active = true
+
+    const render = async () => {
+      try {
+        const isFlowchartLike = /^\s*(graph|flowchart)\b/i.test(chart)
+        const chartToRender = isFlowchartLike
+          ? chart.replace(/<br\s*\/?\s*>/gi, '\n')
+          : chart
+
+        if (typeof document !== 'undefined' && 'fonts' in document) {
+          await document.fonts.ready
+        }
+
+        const mermaid = (await import('mermaid')).default
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'loose',
+          theme: themeKey === 'light' ? 'default' : 'dark',
+          fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+          flowchart: {
+            htmlLabels: false,
+          },
+        })
+        const { svg: rendered } = await mermaid.render(renderId, chartToRender)
+        if (!active) return
+        setError(null)
+        setSvg(rendered)
+      } catch {
+        if (!active) return
+        setSvg('')
+        setError('Unable to render Mermaid diagram.')
+      }
+    }
+
+    render()
+
+    return () => {
+      active = false
+    }
+  }, [chart, renderId, themeKey])
+
+  if (error) {
+    return (
+      <pre>
+        <code>{chart}</code>
+      </pre>
+    )
+  }
+
+  if (!svg) {
+    return <div className="mermaid-loading">Rendering diagram…</div>
+  }
+
+  return <div className="mermaid-diagram" dangerouslySetInnerHTML={{ __html: svg }} />
+}
+
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <div className="prose">
@@ -95,6 +177,18 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeRaw, rehypeSlug]}
         components={{
+          pre({ children, ...props }) {
+            const childArray = React.Children.toArray(children)
+            if (
+              childArray.length === 1 &&
+              React.isValidElement(childArray[0]) &&
+              childArray[0].type === MermaidDiagram
+            ) {
+              return <>{children}</>
+            }
+
+            return <pre {...props}>{children}</pre>
+          },
           blockquote({ node, children, ...props }) {
             const firstChild = getChildren(node)?.[0]
             const isFirstParagraph = isElementNode(firstChild, 'p')
@@ -174,6 +268,18 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                   <div className="md-alert-body">{bodyBlocks}</div>
                 </div>
               </li>
+            )
+          },
+          code({ className, children, ...props }) {
+            const isMermaid = /(^|\s)language-mermaid(\s|$)/.test(className ?? '')
+            if (isMermaid) {
+              return <MermaidDiagram chart={String(children).replace(/\n$/, '')} />
+            }
+
+            return (
+              <code className={className} {...props}>
+                {children}
+              </code>
             )
           },
         }}
