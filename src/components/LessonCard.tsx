@@ -31,7 +31,7 @@ export default function LessonCard({ lesson }: LessonCardProps) {
             alt={lesson.title}
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover"
+            className="object-cover object-[center_25%]"
             onError={() => setFailedImageSrc(lesson.image)}
           />
         ) : (
