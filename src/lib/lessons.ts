@@ -31,8 +31,8 @@ const LESSON_META: Record<string, { title: string; image: string; youtubeId?: st
   '13-wireguard': { title: 'WireGuard Encryption', image: '/images/wg-2.png', youtubeId: 'oNV1ggQ4iAU' },
   '14-calico-ipv6': { title: 'IPv4 & IPv6 Dual-Stack', image: '/images/ipv6-3.png', youtubeId: 'DE05mq4U4gY' },
   '15-selective-bgp-peering': { title: 'Selective BGP Peering', image: '/images/selective-bgp-2.png', youtubeId: 'z3Ht0ACBEgc' },
-  '16-static-ip': { title: 'Static IPs for Pods', image: '/images/ip-1.png', youtubeId: 'qinELDyRRso' },
-  '17-nodelocal-dnscache': { title: 'NodeLocal DNSCache', image: '/images/dns-cache-3.png', youtubeId: 'iT7c3zVnkXA' },
+  '16-static-ip': { title: 'Static IPs for Pods', image: '/images/ip-2.png', youtubeId: 'qinELDyRRso' },
+  '17-nodelocal-dnscache': { title: 'NodeLocal DNSCache', image: '/images/dns-cache-4.png', youtubeId: 'iT7c3zVnkXA' },
   '18-mtu': { title: 'MTU Configuration', image: '/images/mtu-3.png', youtubeId: 'tPFq6cRw1ec' },
   '19-calico-ingress': { title: 'Calico Ingress', image: '/images/ingress-2.png', youtubeId: 'ZOsdo0RADzQ' },
   '20-ingress-tls': { title: 'Ingress TLS', image: '/images/tls-2.png', youtubeId: 'lh1IOcmnS98' },
@@ -83,6 +83,11 @@ function rewriteUrls(markdown: string, slug: string): string {
     .replace(
       /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
       (_, alt, path) => `![${alt}](${rawBase}/${path})`
+    )
+    // Rewrite relative src in HTML <img> tags
+    .replace(
+      /(<img\s[^>]*?src=["'])(?!https?:\/\/)([^"']+)(["'])/gi,
+      (_, before, path, quote) => `${before}${rawBase}/${path}${quote}`
     )
     // Rewrite ../readme.md links → /lab-setup
     .replace(
