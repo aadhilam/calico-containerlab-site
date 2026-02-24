@@ -141,14 +141,19 @@ export function extractHeadings(markdown: string): { id: string; text: string; l
   const stripped = markdown.replace(/```[\s\S]*?```/g, '')
   const headingRegex = /^(#{1,4})\s+(.+)$/gm
   const headings: { id: string; text: string; level: number }[] = []
+  const seenIds = new Map<string, number>()
   let match
 
   while ((match = headingRegex.exec(stripped)) !== null) {
     const text = match[2].trim()
-    const id = text
+    const baseId =
+      text
       .toLowerCase()
       .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
+      .replace(/\s+/g, '-') || 'section'
+    const currentCount = seenIds.get(baseId) ?? 0
+    const id = currentCount === 0 ? baseId : `${baseId}-${currentCount}`
+    seenIds.set(baseId, currentCount + 1)
     headings.push({ id, text, level: match[1].length })
   }
 
