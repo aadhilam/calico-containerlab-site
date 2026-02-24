@@ -2,6 +2,7 @@ const REPO_OWNER = 'aadhilam'
 const REPO_NAME = 'k8-networking-calico-containerlab'
 const BRANCH = 'master'
 const BASE_PATH = 'containerlab'
+const CONTENT_REVALIDATE_SECONDS = 60
 
 export interface Lesson {
   slug: string
@@ -65,7 +66,7 @@ export async function fetchLessonContent(slug: string): Promise<string> {
 
   for (const filename of readmeVariants) {
     const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${BASE_PATH}/${slug}/${filename}`
-    const res = await fetch(url, { next: { revalidate: 3600 } })
+    const res = await fetch(url, { next: { revalidate: CONTENT_REVALIDATE_SECONDS } })
     if (res.ok) {
       const text = await res.text()
       return rewriteUrls(text, slug)
@@ -108,7 +109,7 @@ function rewriteUrls(markdown: string, slug: string): string {
 
 export async function fetchRepoSetupContent(): Promise<string> {
   const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/readme.md`
-  const res = await fetch(url, { next: { revalidate: 3600 } })
+  const res = await fetch(url, { next: { revalidate: CONTENT_REVALIDATE_SECONDS } })
   if (!res.ok) throw new Error('Repo setup README not found')
   const text = await res.text()
   const base = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}`
@@ -125,7 +126,7 @@ export async function fetchRepoSetupContent(): Promise<string> {
 
 export async function fetchLabSetupContent(): Promise<string> {
   const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${BASE_PATH}/readme.md`
-  const res = await fetch(url, { next: { revalidate: 3600 } })
+  const res = await fetch(url, { next: { revalidate: CONTENT_REVALIDATE_SECONDS } })
   if (!res.ok) {
     throw new Error('Lab setup README not found')
   }
