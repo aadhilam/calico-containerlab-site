@@ -46,7 +46,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--bg-secondary)]/80 backdrop-blur-md">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+          <div className="mx-auto flex max-w-7xl items-center justify-between pl-12 pr-6 py-3">
             <Link href="/" className="flex items-center gap-2 text-lg font-bold text-[var(--accent)]">
               <img src="https://avatars.githubusercontent.com/u/12304728?s=200&v=4" alt="Calico" width={28} height={28} className="rounded" />
               Calico Labs

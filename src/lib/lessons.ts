@@ -14,28 +14,28 @@ export interface Lesson {
 const LESSON_META: Record<string, { title: string; image: string; youtubeId?: string }> = {
   '01-calico-ipam': {
     title: 'Calico IPAM',
-    image: '/images/ipam-1.png',
+    image: '/images/ipam-2.png',
     youtubeId: 'G-IGFsMSmrA',
   },
-  '02-pod-network': { title: 'Pod Networking', image: '/images/pod-1.png' },
-  '03-pod-routing': { title: 'Pod Routing Across Nodes', image: '/images/routing-1.png' },
-  '04-k8s-services': { title: 'Kubernetes Services - ClusterIP', image: '/images/clusterip-1.png' },
-  '05-k8s-dns': { title: 'Kubernetes DNS', image: '/images/dns-1.png' },
-  '06-calico-overlay': { title: 'Calico Overlay Networks', image: '/images/overlay-1.png' },
-  '07-calico-bgp': { title: 'Calico BGP', image: '/images/bgp-1.png' },
-  '08-calico-bgp-lb': { title: 'LoadBalancer & BGP Advertisements', image: '/images/lb-1.png' },
-  '09-multi-ippool': { title: 'Multiple IPPools', image: '/images/ippool-1.png' },
-  '10-calico-bgp-ippool': { title: 'Advertise IPPool via BGP', image: '/images/advertise-ippool-1.png' },
-  '11-headless-services': { title: 'Headless Services', image: '/images/ep-1.png' },
-  '12-calico-qos': { title: 'Network QoS - Bandwidth Limiting', image: '/images/qos-1.png' },
-  '13-wireguard': { title: 'WireGuard Encryption', image: '/images/wg-1.png' },
-  '14-calico-ipv6': { title: 'IPv4 & IPv6 Dual-Stack', image: '/images/ipv6-2.png' },
-  '15-selective-bgp-peering': { title: 'Selective BGP Peering', image: '/images/selective-bgp-1.png' },
-  '16-static-ip': { title: 'Static IPs for Pods', image: '/images/ip-1.png' },
-  '17-nodelocal-dnscache': { title: 'NodeLocal DNSCache', image: '/images/dns-cache-1.png' },
-  '18-mtu': { title: 'MTU Configuration', image: '/images/mtu-1.png' },
-  '19-calico-ingress': { title: 'Calico Ingress', image: '/images/ingress-1.png' },
-  '20-ingress-tls': { title: 'Ingress TLS', image: '/images/tls-1.png' },
+  '02-pod-network': { title: 'Pod Networking', image: '/images/pod-3.png', youtubeId: 'jiwlbJiwmHM' },
+  '03-pod-routing': { title: 'Pod Routing Across Nodes', image: '/images/routing-2.png', youtubeId: 'V3QYtAYrac4' },
+  '04-k8s-services': { title: 'Kubernetes Services - ClusterIP', image: '/images/clusterip-2.png', youtubeId: 'qRA3wSmoqss' },
+  '05-k8s-dns': { title: 'Kubernetes DNS', image: '/images/dns-2.png', youtubeId: 'XJ8u11_hLyI' },
+  '06-calico-overlay': { title: 'Calico Overlay Networks', image: '/images/overlay-2.png', youtubeId: 'x3GJoqEo6lc' },
+  '07-calico-bgp': { title: 'Calico BGP', image: '/images/bgp-2.png', youtubeId: 'rDI7oSLLGzU' },
+  '08-calico-bgp-lb': { title: 'LoadBalancer & BGP Advertisements', image: '/images/lb-2.png', youtubeId: '5jQWFfuweZo' },
+  '09-multi-ippool': { title: 'Multiple IPPools', image: '/images/ippool-2.png', youtubeId: '-Y3kkAa_TBk' },
+  '10-calico-bgp-ippool': { title: 'Advertise IPPool via BGP', image: '/images/advertise-ippool-2.png', youtubeId: '_hn1y_JgsfE' },
+  '11-headless-services': { title: 'Headless Services', image: '/images/ep-2.png', youtubeId: '73or5ff9Y5Q' },
+  '12-calico-qos': { title: 'Network QoS - Bandwidth Limiting', image: '/images/qos-2.png', youtubeId: 'WKBzkADsFvA' },
+  '13-wireguard': { title: 'WireGuard Encryption', image: '/images/wg-2.png', youtubeId: 'oNV1ggQ4iAU' },
+  '14-calico-ipv6': { title: 'IPv4 & IPv6 Dual-Stack', image: '/images/ipv6-3.png', youtubeId: 'DE05mq4U4gY' },
+  '15-selective-bgp-peering': { title: 'Selective BGP Peering', image: '/images/selective-bgp-2.png', youtubeId: 'z3Ht0ACBEgc' },
+  '16-static-ip': { title: 'Static IPs for Pods', image: '/images/ip-1.png', youtubeId: 'qinELDyRRso' },
+  '17-nodelocal-dnscache': { title: 'NodeLocal DNSCache', image: '/images/dns-cache-3.png', youtubeId: 'iT7c3zVnkXA' },
+  '18-mtu': { title: 'MTU Configuration', image: '/images/mtu-3.png', youtubeId: 'tPFq6cRw1ec' },
+  '19-calico-ingress': { title: 'Calico Ingress', image: '/images/ingress-2.png', youtubeId: 'ZOsdo0RADzQ' },
+  '20-ingress-tls': { title: 'Ingress TLS', image: '/images/tls-2.png', youtubeId: 'lh1IOcmnS98' },
 }
 
 export function getLessons(): Lesson[] {
@@ -76,15 +76,45 @@ export async function fetchLessonContent(slug: string): Promise<string> {
 }
 
 function rewriteUrls(markdown: string, slug: string): string {
-  const base = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${BASE_PATH}/${slug}`
+  const rawBase = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${BASE_PATH}/${slug}`
+  const blobBase = `https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH}/${BASE_PATH}/${slug}`
   return markdown
+    // Rewrite relative image paths to absolute raw.githubusercontent.com URLs
+    .replace(
+      /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
+      (_, alt, path) => `![${alt}](${rawBase}/${path})`
+    )
+    // Rewrite ../readme.md links → /lab-setup
+    .replace(
+      /\[([^\]]*)\]\(\.\.\/readme\.md(#[^)]*?)?\)/gi,
+      (_, text, hash) => `[${text}](/lab-setup${hash ?? ''})`
+    )
+    // Rewrite ../sibling-lesson/README.md links → /lessons/sibling-lesson
+    .replace(
+      /\[([^\]]*)\]\(\.\.\/([^/\s)]+)\/(?:README|Readme|readme)\.md(#[^)]*?)?\)/gi,
+      (_, text, siblingSlug, hash) => `[${text}](/lessons/${siblingSlug}${hash ?? ''})`
+    )
+    // Rewrite other relative file links (yaml, sh, conf, etc.) → GitHub blob viewer
+    .replace(
+      /\[([^\]]*)\]\((?!https?:\/\/)(?!\/)([^)]+)\)/g,
+      (_, text, path) => `[${text}](${blobBase}/${path})`
+    )
+}
+
+export async function fetchRepoSetupContent(): Promise<string> {
+  const url = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/readme.md`
+  const res = await fetch(url, { next: { revalidate: 3600 } })
+  if (!res.ok) throw new Error('Repo setup README not found')
+  const text = await res.text()
+  const base = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}`
+  return text
     .replace(
       /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
       (_, alt, path) => `![${alt}](${base}/${path})`
     )
     .replace(
-      /\[([^\]]*)\]\(\.\.\/readme\.md(#[^)]*?)?\)/gi,
-      (_, text, hash) => `[${text}](/lab-setup${hash ?? ''})`
+      /\[([^\]]*)\]\(containerlab\/([\w-]+)\/?[^)]*\)/g,
+      (_, text, slug) => `[${text}](/lessons/${slug})`
     )
 }
 

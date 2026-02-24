@@ -73,7 +73,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   return (
     <div className={fontVars}>
       <ProgressTracker slug={slug} />
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto max-w-7xl lesson-shell-offset pl-12 pr-6 py-8">
         <nav className="mb-6 text-sm text-[var(--text-secondary)]">
           <Link href="/" className="hover:text-[var(--accent)] transition-colors">
             Lessons
@@ -108,7 +108,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
             <MarkdownRenderer content={content} />
           </article>
 
-          <aside className="hidden w-72 shrink-0 lg:block xl:w-80">
+          <aside className="hidden w-80 shrink-0 lg:block xl:w-96">
             <TableOfContents headings={headings} />
           </aside>
         </div>
@@ -116,7 +116,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
       </div>
 
       <section className="mt-16 border-t border-[var(--border)] bg-[var(--bg-secondary)]">
-        <div className="mx-auto max-w-7xl px-6 pt-10">
+        <div className="mx-auto max-w-7xl lesson-shell-offset pl-12 pr-6 pt-10">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-3 text-left">
             <div>
               <h2 className="text-xl font-semibold">Explore more lessons</h2>
@@ -133,7 +133,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           </div>
         </div>
 
-        <div className="px-6 pb-10">
+        <div className="pl-12 pr-6 pb-10">
           <LessonScroller lessons={explore} />
         </div>
       </section>

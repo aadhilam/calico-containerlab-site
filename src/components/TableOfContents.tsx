@@ -37,16 +37,16 @@ export default function TableOfContents({ headings }: TableOfContentsProps) {
   if (headings.length === 0) return null
 
   return (
-    <nav className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto overflow-x-hidden text-sm">
+    <nav className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto overflow-x-hidden text-xs">
       <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
         On this page
       </h4>
-      <ul className="min-w-0 space-y-1 border-l border-[var(--border)]">
+      <ul className="min-w-0 space-y-0.5 border-l border-[var(--border)]">
         {headings.map((heading) => (
           <li key={heading.id}>
             <a
               href={`#${heading.id}`}
-              className={`block break-words border-l-2 py-1 transition-colors ${
+              className={`block break-words border-l-2 py-0.5 transition-colors ${
                 heading.level === 1 ? 'pl-2' : ''
               } ${heading.level === 2 ? 'pl-2' : ''} ${
                 heading.level === 3 ? 'pl-4' : ''

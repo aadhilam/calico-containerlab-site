@@ -116,6 +116,14 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
+/* Nudge lesson shells slightly right on ultra-wide screens without overflow. */
+@media (min-width: 1536px) {
+  .lesson-shell-offset {
+    margin-left: calc((100% - 80rem) / 2 + 2rem);
+    margin-right: calc((100% - 80rem) / 2 - 2rem);
+  }
+}
+
 /* Avoid extra-thin text rendering in light mode (especially on macOS) */
 :root[data-theme='light'] body {
   -webkit-font-smoothing: auto;
