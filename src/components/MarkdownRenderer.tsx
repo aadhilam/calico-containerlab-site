@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
@@ -12,6 +12,7 @@ interface MarkdownRendererProps {
 }
 
 type CalloutType = 'note' | 'tip' | 'important' | 'warning' | 'caution'
+type SiteThemeKey = 'dark' | 'light'
 
 const CALLOUT_TITLES: Record<CalloutType, string> = {
   note: 'Note',
@@ -19,6 +20,53 @@ const CALLOUT_TITLES: Record<CalloutType, string> = {
   important: 'Important',
   warning: 'Warning',
   caution: 'Caution',
+}
+
+const MERMAID_THEME_VARIABLES: Record<SiteThemeKey, Record<string, string>> = {
+  dark: {
+    background: '#0d1117',
+    textColor: '#e6edf3',
+    primaryColor: '#1c2128',
+    primaryTextColor: '#e6edf3',
+    primaryBorderColor: '#4b5563',
+    secondaryColor: '#252c35',
+    secondaryTextColor: '#e6edf3',
+    secondaryBorderColor: '#4b5563',
+    tertiaryColor: '#161b22',
+    tertiaryTextColor: '#c9d1d9',
+    tertiaryBorderColor: '#3f4954',
+    mainBkg: '#1c2128',
+    secondBkg: '#252c35',
+    tertiaryBkg: '#161b22',
+    lineColor: '#8b949e',
+    clusterBkg: '#3a3f45',
+    clusterBorder: '#69737d',
+    edgeLabelBackground: '#0d1117',
+    nodeTextColor: '#e6edf3',
+    titleColor: '#f0f6fc',
+  },
+  light: {
+    background: '#f6f8fa',
+    textColor: '#1f2328',
+    primaryColor: '#ffffff',
+    primaryTextColor: '#1f2328',
+    primaryBorderColor: '#9aa4af',
+    secondaryColor: '#ffffff',
+    secondaryTextColor: '#1f2328',
+    secondaryBorderColor: '#9aa4af',
+    tertiaryColor: '#eef2f6',
+    tertiaryTextColor: '#1f2328',
+    tertiaryBorderColor: '#b6bec7',
+    mainBkg: '#ffffff',
+    secondBkg: '#f8fafc',
+    tertiaryBkg: '#eef2f6',
+    lineColor: '#57606a',
+    clusterBkg: '#eef2f6',
+    clusterBorder: '#8c959f',
+    edgeLabelBackground: '#ffffff',
+    nodeTextColor: '#1f2328',
+    titleColor: '#1f2328',
+  },
 }
 
 function getChildren(node: unknown): unknown[] | null {
@@ -89,10 +137,64 @@ function isParagraphElement(
   return React.isValidElement(node) && node.type === 'p'
 }
 
+function promoteMermaidLabelLayers(container: HTMLDivElement | null) {
+  if (!container) return
+  const svg = container.querySelector('svg')
+  if (!svg) return
+
+  // Flowchart renderers use different container group structures.
+  // Promote edgeLabels in any parent group where it exists.
+  const allGroups = svg.querySelectorAll('g')
+  for (const parentGroup of allGroups) {
+    const directGroups = Array.from(parentGroup.children).filter(
+      (child): child is SVGGElement => child instanceof SVGGElement
+    )
+    const edgeLabelsLayer = directGroups.find((group) =>
+      group.classList.contains('edgeLabels')
+    )
+    if (edgeLabelsLayer) {
+      parentGroup.appendChild(edgeLabelsLayer)
+    }
+  }
+
+  // Move cluster labels into a top overlay group per container so nested
+  // child clusters cannot paint over parent cluster titles.
+  const labelsByContainer = new Map<SVGGElement, SVGGElement[]>()
+  const clusterLabels = svg.querySelectorAll('g.cluster > g.cluster-label')
+  for (const label of clusterLabels) {
+    const clusterGroup = label.parentElement
+    const containerGroup = clusterGroup?.parentElement
+    if (!(containerGroup instanceof SVGGElement)) continue
+    const existing = labelsByContainer.get(containerGroup) ?? []
+    existing.push(label)
+    labelsByContainer.set(containerGroup, existing)
+  }
+
+  for (const [containerGroup, labels] of labelsByContainer.entries()) {
+    const directGroups = Array.from(containerGroup.children).filter(
+      (child): child is SVGGElement => child instanceof SVGGElement
+    )
+    let overlay = directGroups.find((group) =>
+      group.classList.contains('clusterLabelsOverlay')
+    )
+
+    if (!overlay) {
+      overlay = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+      overlay.setAttribute('class', 'clusterLabelsOverlay')
+      containerGroup.appendChild(overlay)
+    }
+
+    for (const label of labels) {
+      overlay.appendChild(label)
+    }
+  }
+}
+
 function MermaidDiagram({ chart }: { chart: string }) {
   const [svg, setSvg] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
-  const [themeKey, setThemeKey] = useState<string>('dark')
+  const [themeKey, setThemeKey] = useState<SiteThemeKey>('dark')
+  const containerRef = useRef<HTMLDivElement>(null)
   const renderId = useMemo(
     () => `mermaid-${Math.random().toString(36).slice(2, 10)}`,
     []
@@ -100,11 +202,12 @@ function MermaidDiagram({ chart }: { chart: string }) {
 
   useEffect(() => {
     const root = document.documentElement
-    const nextTheme = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
+    const nextTheme: SiteThemeKey =
+      root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
     setThemeKey(nextTheme)
 
     const observer = new MutationObserver(() => {
-      const updatedTheme =
+      const updatedTheme: SiteThemeKey =
         root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
       setThemeKey(updatedTheme)
     })
@@ -126,8 +229,17 @@ function MermaidDiagram({ chart }: { chart: string }) {
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'loose',
-          theme: themeKey === 'light' ? 'default' : 'dark',
-          fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+          theme: 'base',
+          themeVariables: MERMAID_THEME_VARIABLES[themeKey],
+          markdownAutoWrap: false,
+          flowchart: {
+            htmlLabels: false,
+            subGraphTitleMargin: {
+              top: 4,
+              bottom: 12,
+            },
+            wrappingWidth: 500,
+          },
         })
         const { svg: rendered } = await mermaid.render(renderId, chart)
         if (!active) return
@@ -147,6 +259,11 @@ function MermaidDiagram({ chart }: { chart: string }) {
     }
   }, [chart, renderId, themeKey])
 
+  useEffect(() => {
+    if (!svg) return
+    promoteMermaidLabelLayers(containerRef.current)
+  }, [svg])
+
   if (error) {
     return (
       <pre>
@@ -159,7 +276,13 @@ function MermaidDiagram({ chart }: { chart: string }) {
     return <div className="mermaid-loading">Rendering diagram…</div>
   }
 
-  return <div className="mermaid-diagram" dangerouslySetInnerHTML={{ __html: svg }} />
+  return (
+    <div
+      ref={containerRef}
+      className="mermaid-diagram"
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  )
 }
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
@@ -260,6 +383,13 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                   <div className="md-alert-body">{bodyBlocks}</div>
                 </div>
               </li>
+            )
+          },
+          a({ href, children, ...props }) {
+            return (
+              <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
+                {children}
+              </a>
             )
           },
           code({ className, children, ...props }) {
