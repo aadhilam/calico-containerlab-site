@@ -3,6 +3,16 @@ const REPO_NAME = 'k8-networking-calico-containerlab'
 const BRANCH = 'master'
 const BASE_PATH = 'containerlab'
 const CONTENT_REVALIDATE_SECONDS = 60
+const LAB_SETUP_VIDEOS = [
+  {
+    title: 'Lab Setup',
+    videoId: 'r72rNLBYkeU',
+  },
+  {
+    title: 'Lab Folder Structure',
+    videoId: 'ucsppQ9Fdh0',
+  },
+] as const
 
 export interface Lesson {
   slug: string
@@ -27,16 +37,16 @@ const LESSON_META: Record<string, { title: string; image: string; youtubeId?: st
   '08-calico-bgp-lb': { title: 'LoadBalancer & BGP Advertisements', image: '/images/lb-2.png', youtubeId: '5jQWFfuweZo' },
   '09-multi-ippool': { title: 'Multiple IPPools', image: '/images/ippool-2.png', youtubeId: '-Y3kkAa_TBk' },
   '10-calico-bgp-ippool': { title: 'Advertise IPPool via BGP', image: '/images/advertise-ippool-2.png', youtubeId: '_hn1y_JgsfE' },
-  '11-headless-services': { title: 'Headless Services', image: '/images/ep-2.png', youtubeId: '73or5ff9Y5Q' },
+  '11-headless-services': { title: 'Headless Services', image: '/images/ep-3.png', youtubeId: '73or5ff9Y5Q' },
   '12-calico-qos': { title: 'Network QoS - Bandwidth Limiting', image: '/images/qos-2.png', youtubeId: 'WKBzkADsFvA' },
-  '13-wireguard': { title: 'WireGuard Encryption', image: '/images/wg-2.png', youtubeId: 'oNV1ggQ4iAU' },
+  '13-wireguard': { title: 'WireGuard Encryption', image: '/images/wg-4.png', youtubeId: 'oNV1ggQ4iAU' },
   '14-calico-ipv6': { title: 'IPv4 & IPv6 Dual-Stack', image: '/images/ipv6-3.png', youtubeId: 'DE05mq4U4gY' },
-  '15-selective-bgp-peering': { title: 'Selective BGP Peering', image: '/images/selective-bgp-2.png', youtubeId: 'z3Ht0ACBEgc' },
+  '15-selective-bgp-peering': { title: 'Selective BGP Peering', image: '/images/selective-bgp-4.png', youtubeId: 'z3Ht0ACBEgc' },
   '16-static-ip': { title: 'Static IPs for Pods', image: '/images/ip-2.png', youtubeId: 'qinELDyRRso' },
   '17-nodelocal-dnscache': { title: 'NodeLocal DNSCache', image: '/images/dns-cache-4.png', youtubeId: 'iT7c3zVnkXA' },
-  '18-mtu': { title: 'MTU Configuration', image: '/images/mtu-3.png', youtubeId: 'tPFq6cRw1ec' },
-  '19-calico-ingress': { title: 'Calico Ingress', image: '/images/ingress-2.png', youtubeId: 'ZOsdo0RADzQ' },
-  '20-ingress-tls': { title: 'Ingress TLS', image: '/images/tls-2.png', youtubeId: 'lh1IOcmnS98' },
+  '18-mtu': { title: 'MTU Configuration', image: '/images/mtu-4.png', youtubeId: 'tPFq6cRw1ec' },
+  '19-calico-ingress': { title: 'Calico Ingress', image: '/images/ingress-4.png', youtubeId: 'ZOsdo0RADzQ' },
+  '20-ingress-tls': { title: 'Ingress TLS', image: '/images/tls-3.png', youtubeId: 'lh1IOcmnS98' },
 }
 
 export function getLessons(): Lesson[] {
@@ -132,10 +142,11 @@ export async function fetchLabSetupContent(): Promise<string> {
   }
   const text = await res.text()
   const base = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/${BRANCH}/${BASE_PATH}`
-  return text.replace(
+  const rewritten = text.replace(
     /!\[([^\]]*)\]\((?!https?:\/\/)([^)]+)\)/g,
     (_, alt, path) => `![${alt}](${base}/${path})`
   )
+  return replaceLabSetupVideoWalkthroughSection(rewritten)
 }
 
 export function extractHeadings(markdown: string): { id: string; text: string; level: number }[] {
@@ -159,4 +170,47 @@ export function extractHeadings(markdown: string): { id: string; text: string; l
   }
 
   return headings
+}
+
+function replaceLabSetupVideoWalkthroughSection(markdown: string): string {
+  const headingMatch = markdown.match(/^(#{1,6})\s+Video Walkthrough\s*$/im)
+  if (!headingMatch || headingMatch.index === undefined) {
+    return `${markdown.trimEnd()}\n\n${buildLabSetupVideoWalkthroughSection(2)}`
+  }
+
+  const headingLevel = headingMatch[1].length
+  const sectionStart = headingMatch.index
+  const sectionBodyStart = sectionStart + headingMatch[0].length
+  const rest = markdown.slice(sectionBodyStart)
+  const nextHeadingRegex = new RegExp(`^#{1,${headingLevel}}\\s+`, 'm')
+  const nextHeadingMatch = rest.match(nextHeadingRegex)
+  const sectionEnd =
+    nextHeadingMatch && nextHeadingMatch.index !== undefined
+      ? sectionBodyStart + nextHeadingMatch.index
+      : markdown.length
+
+  return (
+    markdown.slice(0, sectionStart) +
+    buildLabSetupVideoWalkthroughSection(headingLevel) +
+    markdown.slice(sectionEnd)
+  )
+}
+
+function buildLabSetupVideoWalkthroughSection(headingLevel: number): string {
+  const heading = '#'.repeat(headingLevel)
+  const subheading = '#'.repeat(Math.min(headingLevel + 1, 6))
+  const lines = [`${heading} Video Walkthrough`, '']
+
+  for (const { title, videoId } of LAB_SETUP_VIDEOS) {
+    lines.push(`${subheading} ${title}`)
+    lines.push('')
+    lines.push('<div class="youtube-embed">')
+    lines.push(
+      `  <iframe src="https://www.youtube-nocookie.com/embed/${videoId}?rel=0" title="${title} Video Walkthrough" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`
+    )
+    lines.push('</div>')
+    lines.push('')
+  }
+
+  return lines.join('\n')
 }
