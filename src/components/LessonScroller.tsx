@@ -27,7 +27,7 @@ export default function LessonScroller({ lessons }: LessonScrollerProps) {
           type="button"
           onClick={() => scrollByAmount('left')}
           aria-label="Scroll lessons left"
-          className="hidden shrink-0 rounded-full border border-[var(--border)] bg-[var(--bg-card)]/90 p-2 text-[var(--text-secondary)] shadow-sm backdrop-blur hover:border-[var(--accent)]/40 hover:text-[var(--text-primary)] md:inline-flex"
+          className="hidden shrink-0 rounded-full border border-[var(--border)] bg-[var(--bg-card-90)] p-2 text-[var(--text-secondary)] shadow-sm backdrop-blur hover:border-[var(--accent-40)] hover:text-[var(--text-primary)] md:inline-flex"
         >
           ←
         </button>
@@ -49,7 +49,7 @@ export default function LessonScroller({ lessons }: LessonScrollerProps) {
           type="button"
           onClick={() => scrollByAmount('right')}
           aria-label="Scroll lessons right"
-          className="hidden shrink-0 rounded-full border border-[var(--border)] bg-[var(--bg-card)]/90 p-2 text-[var(--text-secondary)] shadow-sm backdrop-blur hover:border-[var(--accent)]/40 hover:text-[var(--text-primary)] md:inline-flex"
+          className="hidden shrink-0 rounded-full border border-[var(--border)] bg-[var(--bg-card-90)] p-2 text-[var(--text-secondary)] shadow-sm backdrop-blur hover:border-[var(--accent-40)] hover:text-[var(--text-primary)] md:inline-flex"
         >
           →
         </button>

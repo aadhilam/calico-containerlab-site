@@ -206,7 +206,7 @@ function buildLabSetupVideoWalkthroughSection(headingLevel: number): string {
     lines.push('')
     lines.push('<div class="youtube-embed">')
     lines.push(
-      `  <iframe src="https://www.youtube-nocookie.com/embed/${videoId}?rel=0" title="${title} Video Walkthrough" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`
+      `  <iframe src="https://www.youtube-nocookie.com/embed/${videoId}?rel=0&playsinline=1&modestbranding=1" title="${title} Video Walkthrough" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`
     )
     lines.push('</div>')
     lines.push('')

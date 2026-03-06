@@ -38,7 +38,7 @@ export default function ThemeToggle() {
         setTheme(nextTheme)
         setThemeState(nextTheme)
       }}
-      className="inline-flex items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--bg-card)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)]/40 hover:text-[var(--text-primary)]"
+      className="inline-flex items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--bg-card)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-40)] hover:text-[var(--text-primary)]"
     >
       {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
       <span className="hidden sm:inline">{theme === 'dark' ? 'Light' : 'Dark'}</span>

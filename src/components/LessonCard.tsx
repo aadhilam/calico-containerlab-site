@@ -22,7 +22,7 @@ export default function LessonCard({ lesson }: LessonCardProps) {
   return (
     <Link
       href={`/lessons/${lesson.slug}`}
-      className="group relative flex flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-card)] transition-all hover:border-[var(--accent)]/50 hover:bg-[var(--bg-card-hover)] hover:shadow-lg hover:shadow-orange-500/5"
+      className="group relative flex flex-col overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-card)] transition-all hover:border-[var(--accent-50)] hover:bg-[var(--bg-card-hover)] hover:shadow-lg hover:shadow-orange-500/5"
     >
       <div className="relative flex h-40 items-center justify-center bg-[var(--bg-secondary)]">
         {showTileImage ? (
@@ -69,7 +69,7 @@ function getLessonCompletion(slug: string) {
 
 function LessonIcon({ order }: { readonly order: number }) {
   return (
-    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--accent)]/10 text-[var(--accent)] text-2xl font-bold font-mono">
+    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--accent-10)] text-[var(--accent)] text-2xl font-bold font-mono">
       {String(order).padStart(2, '0')}
     </div>
   )

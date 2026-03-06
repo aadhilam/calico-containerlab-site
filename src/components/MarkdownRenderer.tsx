@@ -118,11 +118,6 @@ function MermaidDiagram({ chart }: { chart: string }) {
 
     const render = async () => {
       try {
-        const isFlowchartLike = /^\s*(graph|flowchart)\b/i.test(chart)
-        const chartToRender = isFlowchartLike
-          ? chart.replace(/<br\s*\/?\s*>/gi, '\n')
-          : chart
-
         if (typeof document !== 'undefined' && 'fonts' in document) {
           await document.fonts.ready
         }
@@ -133,11 +128,8 @@ function MermaidDiagram({ chart }: { chart: string }) {
           securityLevel: 'loose',
           theme: themeKey === 'light' ? 'default' : 'dark',
           fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-          flowchart: {
-            htmlLabels: false,
-          },
         })
-        const { svg: rendered } = await mermaid.render(renderId, chartToRender)
+        const { svg: rendered } = await mermaid.render(renderId, chart)
         if (!active) return
         setError(null)
         setSvg(rendered)

@@ -93,15 +93,27 @@ export default async function LessonPage({ params }: LessonPageProps) {
                 <div className="mt-6">
                   <div className="relative w-full overflow-hidden rounded-xl border border-[var(--border)] bg-black pt-[56.25%]">
                     <iframe
-                      className="absolute inset-0 h-full w-full"
-                      src={`https://www.youtube-nocookie.com/embed/${lesson.youtubeId}?rel=0`}
+                      className="absolute inset-0 h-full w-full border-0"
+                      src={`https://www.youtube-nocookie.com/embed/${lesson.youtubeId}?rel=0&playsinline=1&modestbranding=1`}
                       title={`${lesson.title} video`}
-                      loading="lazy"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      loading="eager"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
                       referrerPolicy="strict-origin-when-cross-origin"
                       allowFullScreen
                     />
                   </div>
+                  <p className="mt-2 text-sm text-[var(--text-secondary)]">
+                    If video stays blank in Safari,{' '}
+                    <a
+                      className="text-[var(--accent)] hover:underline"
+                      href={`https://www.youtube.com/watch?v=${lesson.youtubeId}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      open it on YouTube
+                    </a>
+                    .
+                  </p>
                 </div>
               )}
             </div>
