@@ -457,7 +457,7 @@ function enforceMermaidTextContrast(container: HTMLDivElement | null) {
       (child): child is SVGElement =>
         child instanceof SVGElement && child.tagName.toLowerCase() === 'rect'
     )
-    const background = resolveElementFillColor(clusterRect, canvasColor)
+    const background = resolveElementFillColor(clusterRect ?? null, canvasColor)
     if (!background) continue
     const label = cluster.querySelector('g.cluster-label')
     if (!label) continue
