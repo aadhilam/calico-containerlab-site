@@ -17,42 +17,45 @@ const LAB_SETUP_VIDEOS = [
 export interface Lesson {
   slug: string
   title: string
+  description: string
   order: number
   image: string
   youtubeId?: string
 }
 
-const LESSON_META: Record<string, { title: string; image: string; youtubeId?: string }> = {
+const LESSON_META: Record<string, { title: string; description: string; image: string; youtubeId?: string }> = {
   '01-calico-ipam': {
     title: 'Calico IPAM',
+    description: 'Explore how Calico assigns pod IPs using IP pools and block affinity.',
     image: '/images/ipam-2.png',
     youtubeId: 'G-IGFsMSmrA',
   },
-  '02-pod-network': { title: 'Pod Networking', image: '/images/pod-3.png', youtubeId: 'jiwlbJiwmHM' },
-  '03-pod-routing': { title: 'Pod Routing Across Nodes', image: '/images/routing-2.png', youtubeId: 'V3QYtAYrac4' },
-  '04-k8s-services': { title: 'Kubernetes Services - ClusterIP', image: '/images/clusterip-2.png', youtubeId: 'qRA3wSmoqss' },
-  '05-k8s-dns': { title: 'Kubernetes DNS', image: '/images/dns-2.png', youtubeId: 'XJ8u11_hLyI' },
-  '06-calico-overlay': { title: 'Calico Overlay Networks', image: '/images/overlay-2.png', youtubeId: 'x3GJoqEo6lc' },
-  '07-calico-bgp': { title: 'Calico BGP', image: '/images/bgp-2.png', youtubeId: 'rDI7oSLLGzU' },
-  '08-calico-bgp-lb': { title: 'LoadBalancer & BGP Advertisements', image: '/images/lb-2.png', youtubeId: '5jQWFfuweZo' },
-  '09-multi-ippool': { title: 'Multiple IPPools', image: '/images/ippool-2.png', youtubeId: '-Y3kkAa_TBk' },
-  '10-calico-bgp-ippool': { title: 'Advertise IPPool via BGP', image: '/images/advertise-ippool-2.png', youtubeId: '_hn1y_JgsfE' },
-  '11-headless-services': { title: 'Headless Services', image: '/images/ep-3.png', youtubeId: '73or5ff9Y5Q' },
-  '12-calico-qos': { title: 'Network QoS - Bandwidth Limiting', image: '/images/qos-2.png', youtubeId: 'WKBzkADsFvA' },
-  '13-wireguard': { title: 'WireGuard Encryption', image: '/images/wg-4.png', youtubeId: 'oNV1ggQ4iAU' },
-  '14-calico-ipv6': { title: 'IPv4 & IPv6 Dual-Stack', image: '/images/ipv6-3.png', youtubeId: 'DE05mq4U4gY' },
-  '15-selective-bgp-peering': { title: 'Selective BGP Peering', image: '/images/selective-bgp-4.png', youtubeId: 'z3Ht0ACBEgc' },
-  '16-static-ip': { title: 'Static IPs for Pods', image: '/images/ip-2.png', youtubeId: 'qinELDyRRso' },
-  '17-nodelocal-dnscache': { title: 'NodeLocal DNSCache', image: '/images/dns-cache-4.png', youtubeId: 'iT7c3zVnkXA' },
-  '18-mtu': { title: 'MTU Configuration', image: '/images/mtu-4.png', youtubeId: 'tPFq6cRw1ec' },
-  '19-calico-ingress': { title: 'Calico Ingress', image: '/images/ingress-4.png', youtubeId: 'ZOsdo0RADzQ' },
-  '20-ingress-tls': { title: 'Ingress TLS', image: '/images/tls-3.png', youtubeId: 'lh1IOcmnS98' },
+  '02-pod-network': { title: 'Pod Networking', description: 'Understand how pods communicate within a node using the Calico CNI plugin.', image: '/images/pod-3.png', youtubeId: 'jiwlbJiwmHM' },
+  '03-pod-routing': { title: 'Pod Routing Across Nodes', description: 'Learn how traffic is routed between pods on different nodes using host routing.', image: '/images/routing-2.png', youtubeId: 'V3QYtAYrac4' },
+  '04-k8s-services': { title: 'Kubernetes Services - ClusterIP', description: 'Deep dive into how ClusterIP services route traffic via iptables and kube-proxy.', image: '/images/clusterip-2.png', youtubeId: 'qRA3wSmoqss' },
+  '05-k8s-dns': { title: 'Kubernetes DNS', description: 'Explore CoreDNS and how Kubernetes resolves service names to cluster IPs.', image: '/images/dns-2.png', youtubeId: 'XJ8u11_hLyI' },
+  '06-calico-overlay': { title: 'Calico Overlay Networks', description: 'Configure VXLAN and IP-in-IP overlays for cross-subnet pod communication.', image: '/images/overlay-2.png', youtubeId: 'x3GJoqEo6lc' },
+  '07-calico-bgp': { title: 'Calico BGP', description: 'Set up BGP peering between Calico nodes to exchange pod routes dynamically.', image: '/images/bgp-2.png', youtubeId: 'rDI7oSLLGzU' },
+  '08-calico-bgp-lb': { title: 'LoadBalancer & BGP Advertisements', description: 'Advertise LoadBalancer service IPs to external networks via BGP.', image: '/images/lb-2.png', youtubeId: '5jQWFfuweZo' },
+  '09-multi-ippool': { title: 'Multiple IPPools', description: 'Create and assign multiple IP pools to segregate workloads by namespace or node.', image: '/images/ippool-2.png', youtubeId: '-Y3kkAa_TBk' },
+  '10-calico-bgp-ippool': { title: 'Advertise IPPool via BGP', description: 'Announce pod IP ranges to upstream routers for direct external pod access.', image: '/images/advertise-ippool-2.png', youtubeId: '_hn1y_JgsfE' },
+  '11-headless-services': { title: 'Headless Services', description: 'Use headless services to discover individual pod IPs directly via DNS.', image: '/images/ep-3.png', youtubeId: '73or5ff9Y5Q' },
+  '12-calico-qos': { title: 'Network QoS - Bandwidth Limiting', description: 'Apply ingress and egress bandwidth limits to pods using Calico annotations.', image: '/images/qos-2.png', youtubeId: 'WKBzkADsFvA' },
+  '13-wireguard': { title: 'WireGuard Encryption', description: 'Enable transparent WireGuard encryption for all pod-to-pod traffic in the cluster.', image: '/images/wg-4.png', youtubeId: 'oNV1ggQ4iAU' },
+  '14-calico-ipv6': { title: 'IPv4 & IPv6 Dual-Stack', description: 'Configure Calico for dual-stack networking with both IPv4 and IPv6 pod addresses.', image: '/images/ipv6-3.png', youtubeId: 'DE05mq4U4gY' },
+  '15-selective-bgp-peering': { title: 'Selective BGP Peering', description: 'Control which nodes peer with which BGP neighbors using node selectors.', image: '/images/selective-bgp-4.png', youtubeId: 'z3Ht0ACBEgc' },
+  '16-static-ip': { title: 'Static IPs for Pods', description: 'Assign fixed IP addresses to specific pods using Calico IPAM annotations.', image: '/images/ip-2.png', youtubeId: 'qinELDyRRso' },
+  '17-nodelocal-dnscache': { title: 'NodeLocal DNSCache', description: 'Speed up DNS resolution by running a local DNS cache daemonset on every node.', image: '/images/dns-cache-4.png', youtubeId: 'iT7c3zVnkXA' },
+  '18-mtu': { title: 'MTU Configuration', description: 'Tune MTU settings across your cluster to optimise throughput and avoid fragmentation.', image: '/images/mtu-4.png', youtubeId: 'tPFq6cRw1ec' },
+  '19-calico-ingress': { title: 'Calico Ingress', description: 'Configure Ingress resources with Calico network policy for fine-grained traffic control.', image: '/images/ingress-4.png', youtubeId: 'ZOsdo0RADzQ' },
+  '20-ingress-tls': { title: 'Ingress TLS', description: 'Secure Ingress endpoints with TLS certificates issued by cert-manager.', image: '/images/tls-3.png', youtubeId: 'lh1IOcmnS98' },
 }
 
 export function getLessons(): Lesson[] {
   return Object.entries(LESSON_META).map(([slug, meta]) => ({
     slug,
     title: meta.title,
+    description: meta.description,
     order: parseInt(slug.split('-')[0], 10),
     image: meta.image,
     youtubeId: meta.youtubeId,
@@ -65,6 +68,7 @@ export function getLesson(slug: string): Lesson | undefined {
   return {
     slug,
     title: meta.title,
+    description: meta.description,
     order: parseInt(slug.split('-')[0], 10),
     image: meta.image,
     youtubeId: meta.youtubeId,
