@@ -1,12 +1,29 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useSyncExternalStore } from 'react'
 
 type Theme = 'light' | 'dark'
 
 function readThemeFromDom(): Theme {
+  if (typeof document === 'undefined') return 'dark'
   const theme = document.documentElement.dataset.theme
   return theme === 'light' ? 'light' : 'dark'
+}
+
+function subscribeToTheme(onThemeChange: () => void) {
+  if (typeof window === 'undefined') return () => {}
+
+  const observer = new MutationObserver(() => onThemeChange())
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+  })
+
+  return () => observer.disconnect()
+}
+
+function getServerThemeSnapshot(): Theme {
+  return 'dark'
 }
 
 function setTheme(theme: Theme) {
@@ -19,10 +36,11 @@ function setTheme(theme: Theme) {
 }
 
 export default function ThemeToggle() {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof document === 'undefined') return 'dark'
-    return readThemeFromDom()
-  })
+  const theme = useSyncExternalStore(
+    subscribeToTheme,
+    readThemeFromDom,
+    getServerThemeSnapshot
+  )
 
   const nextTheme = useMemo<Theme>(
     () => (theme === 'dark' ? 'light' : 'dark'),
@@ -36,7 +54,6 @@ export default function ThemeToggle() {
       title={`Switch to ${nextTheme} theme`}
       onClick={() => {
         setTheme(nextTheme)
-        setThemeState(nextTheme)
       }}
       className="inline-flex items-center gap-2 rounded-md border border-[var(--border)] bg-[var(--bg-card)] px-3 py-1.5 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--accent-40)] hover:text-[var(--text-primary)]"
     >
