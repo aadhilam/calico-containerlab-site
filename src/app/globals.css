@@ -328,21 +328,6 @@ body {
   line-height: 1.5;
 }
 
-:root[data-theme='dark'] .prose .mermaid-diagram .edgeLabel rect,
-:root[data-theme='dark'] .prose .mermaid-diagram .labelBkg {
-  fill: #0d1117 !important;
-}
-
-:root[data-theme='dark'] .prose .mermaid-diagram .label text,
-:root[data-theme='dark'] .prose .mermaid-diagram .nodeLabel,
-:root[data-theme='dark'] .prose .mermaid-diagram .nodeLabel p,
-:root[data-theme='dark'] .prose .mermaid-diagram .edgeLabel text,
-:root[data-theme='dark'] .prose .mermaid-diagram .cluster-label text,
-:root[data-theme='dark'] .prose .mermaid-diagram .cluster-label span {
-  color: #e6edf3 !important;
-  fill: #e6edf3 !important;
-}
-
 /* Code blocks: keep monochrome even if tokens/classes exist */
 .prose pre code span,
 .prose pre code .hljs *,

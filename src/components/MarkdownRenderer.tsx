@@ -69,6 +69,49 @@ const MERMAID_THEME_VARIABLES: Record<SiteThemeKey, Record<string, string>> = {
   },
 }
 
+const MERMAID_FLOWCHART_CONFIG = {
+  htmlLabels: false,
+  subGraphTitleMargin: {
+    top: 4,
+    bottom: 12,
+  },
+  wrappingWidth: 500,
+} as const
+
+const MERMAID_BASE_CONFIG = {
+  startOnLoad: false,
+  securityLevel: 'loose',
+  theme: 'base',
+  markdownAutoWrap: false,
+} as const
+
+const MERMAID_MIN_TEXT_CONTRAST = 4.5
+const MERMAID_TEXT_LIGHT_RGB = { r: 230, g: 237, b: 243, a: 1 }
+const MERMAID_TEXT_DARK_RGB = { r: 31, g: 35, b: 40, a: 1 }
+const MERMAID_FALLBACK_CANVAS_RGB = { r: 13, g: 17, b: 23, a: 1 }
+const MERMAID_SHAPE_SELECTOR = 'rect, polygon, ellipse, circle, path'
+
+type RgbaColor = {
+  r: number
+  g: number
+  b: number
+  a: number
+}
+
+function getSiteThemeKey(root: Element): SiteThemeKey {
+  return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
+}
+
+function createMermaidConfig(themeKey: SiteThemeKey) {
+  return {
+    ...MERMAID_BASE_CONFIG,
+    themeVariables: MERMAID_THEME_VARIABLES[themeKey],
+    flowchart: {
+      ...MERMAID_FLOWCHART_CONFIG,
+    },
+  }
+}
+
 function getChildren(node: unknown): unknown[] | null {
   if (!node || typeof node !== 'object') return null
   const children = (node as { children?: unknown }).children
@@ -162,6 +205,7 @@ function promoteMermaidLabelLayers(container: HTMLDivElement | null) {
   const labelsByContainer = new Map<SVGGElement, SVGGElement[]>()
   const clusterLabels = svg.querySelectorAll('g.cluster > g.cluster-label')
   for (const label of clusterLabels) {
+    if (!(label instanceof SVGGElement)) continue
     const clusterGroup = label.parentElement
     const containerGroup = clusterGroup?.parentElement
     if (!(containerGroup instanceof SVGGElement)) continue
@@ -190,6 +234,245 @@ function promoteMermaidLabelLayers(container: HTMLDivElement | null) {
   }
 }
 
+function clampChannel(value: number): number {
+  return Math.max(0, Math.min(255, value))
+}
+
+function clampAlpha(value: number): number {
+  return Math.max(0, Math.min(1, value))
+}
+
+function parseRgbChannel(raw: string): number | null {
+  const value = raw.trim()
+  if (!value) return null
+  if (value.endsWith('%')) {
+    const percent = Number.parseFloat(value.slice(0, -1))
+    if (!Number.isFinite(percent)) return null
+    return clampChannel((percent / 100) * 255)
+  }
+
+  const numeric = Number.parseFloat(value)
+  if (!Number.isFinite(numeric)) return null
+  return clampChannel(numeric)
+}
+
+function parseAlphaChannel(raw: string): number | null {
+  const value = raw.trim()
+  if (!value) return null
+  if (value.endsWith('%')) {
+    const percent = Number.parseFloat(value.slice(0, -1))
+    if (!Number.isFinite(percent)) return null
+    return clampAlpha(percent / 100)
+  }
+
+  const numeric = Number.parseFloat(value)
+  if (!Number.isFinite(numeric)) return null
+  return clampAlpha(numeric)
+}
+
+function parseCssColor(rawColor: string): RgbaColor | null {
+  const color = rawColor.trim()
+  if (!color || color === 'none' || color === 'transparent' || color.startsWith('url(')) {
+    return null
+  }
+
+  const hexMatch = color.match(/^#([0-9a-f]+)$/i)
+  if (hexMatch) {
+    const hex = hexMatch[1]
+    if (hex.length === 3 || hex.length === 4) {
+      const r = Number.parseInt(hex[0] + hex[0], 16)
+      const g = Number.parseInt(hex[1] + hex[1], 16)
+      const b = Number.parseInt(hex[2] + hex[2], 16)
+      const a = hex.length === 4 ? Number.parseInt(hex[3] + hex[3], 16) / 255 : 1
+      return { r, g, b, a }
+    }
+    if (hex.length === 6 || hex.length === 8) {
+      const r = Number.parseInt(hex.slice(0, 2), 16)
+      const g = Number.parseInt(hex.slice(2, 4), 16)
+      const b = Number.parseInt(hex.slice(4, 6), 16)
+      const a = hex.length === 8 ? Number.parseInt(hex.slice(6, 8), 16) / 255 : 1
+      return { r, g, b, a }
+    }
+  }
+
+  const fnMatch = color.match(/^rgba?\((.+)\)$/i)
+  if (!fnMatch) return null
+  const content = fnMatch[1].trim()
+
+  if (content.includes(',')) {
+    const parts = content.split(',').map((part) => part.trim())
+    if (parts.length < 3) return null
+    const r = parseRgbChannel(parts[0])
+    const g = parseRgbChannel(parts[1])
+    const b = parseRgbChannel(parts[2])
+    if (r === null || g === null || b === null) return null
+    const a = parts.length >= 4 ? parseAlphaChannel(parts[3]) : 1
+    if (a === null) return null
+    return { r, g, b, a }
+  }
+
+  const slashParts = content.split('/').map((part) => part.trim())
+  const rgbParts = slashParts[0].split(/\s+/).filter(Boolean)
+  if (rgbParts.length < 3) return null
+  const r = parseRgbChannel(rgbParts[0])
+  const g = parseRgbChannel(rgbParts[1])
+  const b = parseRgbChannel(rgbParts[2])
+  if (r === null || g === null || b === null) return null
+  const a = slashParts[1] ? parseAlphaChannel(slashParts[1]) : 1
+  if (a === null) return null
+  return { r, g, b, a }
+}
+
+function blendColors(foreground: RgbaColor, background: RgbaColor): RgbaColor {
+  const alpha = clampAlpha(foreground.a)
+  const inverse = 1 - alpha
+  return {
+    r: Math.round(foreground.r * alpha + background.r * inverse),
+    g: Math.round(foreground.g * alpha + background.g * inverse),
+    b: Math.round(foreground.b * alpha + background.b * inverse),
+    a: 1,
+  }
+}
+
+function toLinearChannel(value: number): number {
+  const normalized = clampChannel(value) / 255
+  return normalized <= 0.03928
+    ? normalized / 12.92
+    : ((normalized + 0.055) / 1.055) ** 2.4
+}
+
+function getRelativeLuminance(color: RgbaColor): number {
+  const r = toLinearChannel(color.r)
+  const g = toLinearChannel(color.g)
+  const b = toLinearChannel(color.b)
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b
+}
+
+function getContrastRatio(colorA: RgbaColor, colorB: RgbaColor): number {
+  const lumA = getRelativeLuminance(colorA)
+  const lumB = getRelativeLuminance(colorB)
+  const lighter = Math.max(lumA, lumB)
+  const darker = Math.min(lumA, lumB)
+  return (lighter + 0.05) / (darker + 0.05)
+}
+
+function resolveCanvasColor(): RgbaColor {
+  const rootStyles = getComputedStyle(document.documentElement)
+  const bgFromVar = parseCssColor(rootStyles.getPropertyValue('--bg-primary'))
+  if (bgFromVar) return bgFromVar
+
+  const bodyBg = parseCssColor(getComputedStyle(document.body).backgroundColor)
+  if (bodyBg) return bodyBg
+
+  return MERMAID_FALLBACK_CANVAS_RGB
+}
+
+function resolveElementFillColor(element: SVGElement | null, canvasColor: RgbaColor): RgbaColor | null {
+  if (!element) return null
+  const candidates = [
+    element.getAttribute('fill'),
+    element.style.fill,
+    getComputedStyle(element).fill,
+  ]
+
+  for (const candidate of candidates) {
+    if (!candidate) continue
+    const parsed = parseCssColor(candidate)
+    if (!parsed) continue
+    if (parsed.a <= 0) continue
+    return parsed.a < 1 ? blendColors(parsed, canvasColor) : { ...parsed, a: 1 }
+  }
+
+  return null
+}
+
+function findGroupBackgroundColor(group: ParentNode, canvasColor: RgbaColor): RgbaColor | null {
+  const shapes = group.querySelectorAll<SVGElement>(MERMAID_SHAPE_SELECTOR)
+  for (const shape of shapes) {
+    const fill = resolveElementFillColor(shape, canvasColor)
+    if (fill) return fill
+  }
+  return null
+}
+
+function resolveTextColor(element: Element, canvasColor: RgbaColor): RgbaColor | null {
+  if (!(element instanceof SVGElement || element instanceof HTMLElement)) return null
+  const styles = getComputedStyle(element)
+  const parsed = parseCssColor(styles.fill) ?? parseCssColor(styles.color)
+  if (!parsed) return null
+  if (parsed.a <= 0) return null
+  return parsed.a < 1 ? blendColors(parsed, canvasColor) : { ...parsed, a: 1 }
+}
+
+function setTextColor(element: Element, color: string) {
+  if (element instanceof SVGElement) {
+    element.style.setProperty('fill', color, 'important')
+    element.style.setProperty('color', color, 'important')
+    element.setAttribute('fill', color)
+    return
+  }
+
+  if (element instanceof HTMLElement) {
+    element.style.setProperty('color', color, 'important')
+    element.style.setProperty('fill', color, 'important')
+  }
+}
+
+function enforceGroupTextContrast(group: ParentNode, background: RgbaColor, canvasColor: RgbaColor) {
+  const textNodes = group.querySelectorAll('text, tspan, foreignObject p, foreignObject span')
+  if (textNodes.length === 0) return
+
+  const lightContrast = getContrastRatio(MERMAID_TEXT_LIGHT_RGB, background)
+  const darkContrast = getContrastRatio(MERMAID_TEXT_DARK_RGB, background)
+  const preferredColor = lightContrast >= darkContrast ? '#e6edf3' : '#1f2328'
+
+  for (const textNode of textNodes) {
+    const currentColor = resolveTextColor(textNode, canvasColor)
+    if (!currentColor) continue
+    const currentContrast = getContrastRatio(currentColor, background)
+    if (currentContrast >= MERMAID_MIN_TEXT_CONTRAST) continue
+    setTextColor(textNode, preferredColor)
+  }
+}
+
+function enforceMermaidTextContrast(container: HTMLDivElement | null) {
+  if (!container) return
+  const svg = container.querySelector('svg')
+  if (!svg) return
+
+  const canvasColor = resolveCanvasColor()
+
+  const nodeGroups = svg.querySelectorAll('g.node')
+  for (const group of nodeGroups) {
+    if (!(group instanceof SVGGElement)) continue
+    const background = findGroupBackgroundColor(group, canvasColor)
+    if (!background) continue
+    enforceGroupTextContrast(group, background, canvasColor)
+  }
+
+  const clusterGroups = svg.querySelectorAll('g.cluster')
+  for (const cluster of clusterGroups) {
+    if (!(cluster instanceof SVGGElement)) continue
+    const clusterRect = Array.from(cluster.children).find(
+      (child): child is SVGElement =>
+        child instanceof SVGElement && child.tagName.toLowerCase() === 'rect'
+    )
+    const background = resolveElementFillColor(clusterRect, canvasColor)
+    if (!background) continue
+    const label = cluster.querySelector('g.cluster-label')
+    if (!label) continue
+    enforceGroupTextContrast(label, background, canvasColor)
+  }
+
+  const edgeLabels = svg.querySelectorAll('g.edgeLabel')
+  for (const edgeLabel of edgeLabels) {
+    if (!(edgeLabel instanceof SVGGElement)) continue
+    const rect = edgeLabel.querySelector<SVGElement>('rect')
+    const background = resolveElementFillColor(rect, canvasColor) ?? canvasColor
+    enforceGroupTextContrast(edgeLabel, background, canvasColor)
+  }
+}
+
 function MermaidDiagram({ chart }: { chart: string }) {
   const [svg, setSvg] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
@@ -202,13 +485,11 @@ function MermaidDiagram({ chart }: { chart: string }) {
 
   useEffect(() => {
     const root = document.documentElement
-    const nextTheme: SiteThemeKey =
-      root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
+    const nextTheme = getSiteThemeKey(root)
     setThemeKey(nextTheme)
 
     const observer = new MutationObserver(() => {
-      const updatedTheme: SiteThemeKey =
-        root.getAttribute('data-theme') === 'light' ? 'light' : 'dark'
+      const updatedTheme = getSiteThemeKey(root)
       setThemeKey(updatedTheme)
     })
 
@@ -226,21 +507,7 @@ function MermaidDiagram({ chart }: { chart: string }) {
         }
 
         const mermaid = (await import('mermaid')).default
-        mermaid.initialize({
-          startOnLoad: false,
-          securityLevel: 'loose',
-          theme: 'base',
-          themeVariables: MERMAID_THEME_VARIABLES[themeKey],
-          markdownAutoWrap: false,
-          flowchart: {
-            htmlLabels: false,
-            subGraphTitleMargin: {
-              top: 4,
-              bottom: 12,
-            },
-            wrappingWidth: 500,
-          },
-        })
+        mermaid.initialize(createMermaidConfig(themeKey))
         const { svg: rendered } = await mermaid.render(renderId, chart)
         if (!active) return
         setError(null)
@@ -261,7 +528,9 @@ function MermaidDiagram({ chart }: { chart: string }) {
 
   useEffect(() => {
     if (!svg) return
-    promoteMermaidLabelLayers(containerRef.current)
+    const container = containerRef.current
+    enforceMermaidTextContrast(container)
+    promoteMermaidLabelLayers(container)
   }, [svg])
 
   if (error) {
