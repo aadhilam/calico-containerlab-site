@@ -49,7 +49,7 @@ export default function RootLayout({
           <div className="mx-auto flex max-w-7xl items-center justify-between pl-12 pr-6 py-3">
             <Link href="/" className="flex items-center gap-2 text-lg font-bold text-[var(--accent)]">
               <img src="https://avatars.githubusercontent.com/u/12304728?s=200&v=4" alt="Calico" width={28} height={28} className="rounded" />
-              Calico Labs
+              Calico Community Labs
             </Link>
             <nav className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
               <Link href="/" className="hover:text-[var(--text-primary)] transition-colors">

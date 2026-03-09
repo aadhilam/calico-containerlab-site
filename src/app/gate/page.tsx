@@ -1,15 +1,13 @@
 "use client"
 
-import { useState, type FormEvent } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 export default function GatePage() {
   const [email, setEmail] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
-  const router = useRouter()
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")
     setLoading(true)
@@ -27,7 +25,7 @@ export default function GatePage() {
         return
       }
 
-      router.push("/")
+      window.location.href = "/"
     } catch {
       setError("Something went wrong. Please try again.")
     } finally {
@@ -47,7 +45,9 @@ export default function GatePage() {
             className="mx-auto mb-4 rounded"
           />
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-            Calico Kubernetes Labs
+            Kubernetes Networking
+            <br />
+            Calico Community Labs
           </h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
             Enter your email to access the learning hub
