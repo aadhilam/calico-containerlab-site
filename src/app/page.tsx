@@ -65,6 +65,30 @@ export default function Home() {
               </p>
             </div>
           </a>
+          <a
+            href="https://www.tigera.io/project-calico/community/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-start gap-5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5 transition-all hover:border-[var(--accent-50)] hover:bg-[var(--bg-card-hover)] hover:shadow-lg hover:shadow-orange-500/5 sm:max-w-sm"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--accent-10)] text-[var(--accent)]">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-mono font-semibold text-[var(--accent)]">COMMUNITY</span>
+              <h2 className="text-sm font-semibold leading-snug text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
+                Join the Calico Community
+              </h2>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                Connect with fellow users, ask questions, and stay up to date with the latest from Project Calico.
+              </p>
+            </div>
+          </a>
         </div>
       </section>
 

@@ -337,6 +337,73 @@ body {
   font-style: inherit !important;
 }
 
+/* YAML preview popover */
+.yaml-preview-wrapper {
+  position: relative;
+  display: inline;
+}
+
+.yaml-preview-hint {
+  margin-left: 2px;
+  font-size: 0.7em;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+}
+
+.yaml-preview-wrapper:hover .yaml-preview-hint {
+  opacity: 0.8;
+}
+
+.yaml-preview-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 50;
+  width: min(600px, 90vw);
+  max-height: 400px;
+  overflow: auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.yaml-preview-loading {
+  padding: 12px 16px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+code.yaml-preview-code {
+  display: block;
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  white-space: pre;
+  overflow-x: auto;
+  color: var(--text-primary);
+  background: transparent;
+  border-radius: 0;
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.yaml-key { color: #7ee787; }
+.yaml-colon { color: var(--text-secondary); }
+.yaml-string { color: #a5d6ff; }
+.yaml-number { color: #79c0ff; }
+.yaml-bool { color: #ff7b72; }
+.yaml-null { color: #ffa657; }
+.yaml-comment { color: #8b949e; font-style: italic; }
+.yaml-dash { color: var(--text-secondary); }
+
+:root[data-theme='light'] .yaml-key { color: #116329; }
+:root[data-theme='light'] .yaml-string { color: #0a3069; }
+:root[data-theme='light'] .yaml-number { color: #0550ae; }
+:root[data-theme='light'] .yaml-bool { color: #cf222e; }
+:root[data-theme='light'] .yaml-null { color: #953800; }
+:root[data-theme='light'] .yaml-comment { color: #6e7781; }
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-primary); }

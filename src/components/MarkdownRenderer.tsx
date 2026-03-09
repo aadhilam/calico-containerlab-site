@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeRaw from 'rehype-raw'
 import rehypeSlug from 'rehype-slug'
+import YamlPreviewLink from './YamlPreviewLink'
 
 interface MarkdownRendererProps {
   readonly content: string
@@ -473,6 +474,13 @@ function enforceMermaidTextContrast(container: HTMLDivElement | null) {
   }
 }
 
+function escapeLiteralTagPlaceholders(markdown: string): string {
+  // Some lesson docs use <hash> as literal placeholder text (not HTML).
+  return markdown
+    .replace(/<hash>/g, '&lt;hash&gt;')
+    .replace(/<\/hash>/g, '&lt;/hash&gt;')
+}
+
 function MermaidDiagram({ chart }: { chart: string }) {
   const [svg, setSvg] = useState<string>('')
   const [error, setError] = useState<string | null>(null)
@@ -555,6 +563,11 @@ function MermaidDiagram({ chart }: { chart: string }) {
 }
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
+  const normalizedContent = useMemo(
+    () => escapeLiteralTagPlaceholders(content),
+    [content]
+  )
+
   return (
     <div className="prose">
       <ReactMarkdown
@@ -655,6 +668,9 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
             )
           },
           a({ href, children, ...props }) {
+            if (href && /\.ya?ml$/i.test(href)) {
+              return <YamlPreviewLink href={href}>{children}</YamlPreviewLink>
+            }
             return (
               <a href={href} target="_blank" rel="noopener noreferrer" {...props}>
                 {children}
@@ -675,7 +691,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
           },
         }}
       >
-        {content}
+        {normalizedContent}
       </ReactMarkdown>
     </div>
   )
