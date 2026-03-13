@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
 
 export function middleware(request: NextRequest) {
+  if (process.env.NEXT_PUBLIC_ENABLE_GATE !== "true") {
+    return NextResponse.next()
+  }
+
   const hasAccess = request.cookies.get("site_access")?.value === "granted"
 
   if (!hasAccess) {
