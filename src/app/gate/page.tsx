@@ -45,9 +45,7 @@ export default function GatePage() {
             className="mx-auto mb-4 rounded"
           />
           <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-            Kubernetes Networking
-            <br />
-            Calico Community Labs
+            Kubernetes Networking Labs
           </h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
             Enter your email to access the learning hub

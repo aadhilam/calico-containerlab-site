@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import Script from "next/script"
 import "./globals.css"
 import ThemeToggle from "@/components/ThemeToggle"
+import VisitorTracker from "@/components/VisitorTracker"
 import Link from "next/link"
 
 const geistSans = Geist({
@@ -19,6 +20,9 @@ export const metadata: Metadata = {
   title: "Calico Kubernetes Networking Labs",
   description:
     "Learn Calico networking for Kubernetes with hands-on ContainerLab exercises",
+  icons: {
+    icon: "/favicon.svg",
+  },
 }
 
 export default function RootLayout({
@@ -66,6 +70,7 @@ export default function RootLayout({
             </nav>
           </div>
         </header>
+        <VisitorTracker />
         <main>{children}</main>
       </body>
     </html>
